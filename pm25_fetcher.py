@@ -6,7 +6,7 @@ from datetime import datetime
 
 # Constants
 CITY = "Karachi"
-WAQI_TOKEN = os.getenv("WAQI_TOKEN")  # Securely loaded from GitHub Secrets
+WAQI_TOKEN = os.environ.get("WAQI_TOKEN")  
 OUTPUT_FILE = "waqi_karachi_pm25_hourly.csv"
 
 # Function to fetch PM2.5 data from WAQI
