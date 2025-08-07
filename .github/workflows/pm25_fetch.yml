@@ -1,9 +1,9 @@
 name: Fetch PM2.5 AQI Data
 
-on:
-  schedule:
-    - cron: '0 * * * *'  # Runs every hour
-  workflow_dispatch:      # Manual trigger support
+# on:
+#   schedule:
+#     - cron: '0 * * * *'  # Runs every hour
+#   workflow_dispatch:      # Manual trigger support
 
 jobs:
   fetch-data:
