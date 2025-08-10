@@ -1,7 +1,6 @@
 # Core dependencies
 pandas
 numpy
-joblib
 matplotlib
 scikit-learn
 xgboost
