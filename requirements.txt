@@ -1,0 +1,14 @@
+# Core dependencies
+pandas
+numpy
+scikit-learn
+xgboost
+
+# API & HTTP requests
+requests
+
+# Time zone handling
+pytz
+
+# Optional: progress bars / debugging
+tqdm
