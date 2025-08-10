@@ -1,28 +1,29 @@
 name: PM2.5 Fetcher
 
 on:
-  workflow_dispatch:  # Allow manual trigger
-  schedule:
-    - cron: '0 * * * *'  # Runs every hour (UTC)
+  workflow_dispatch:  # allows manual trigger
 
 jobs:
   run-fetcher:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
-    - name: Install dependencies
-      run: pip install --upgrade pip && pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Run PM2.5 fetcher
-      env:
-        VISUAL_CROSSING_KEY: ${{ secrets.VISUAL_CROSSING_KEY }}
-        WAQI_TOKEN: ${{ secrets.WAQI_TOKEN }}
-      run: python pm25_fetcher.py
+      - name: Run PM2.5 fetcher
+        env:
+          VISUAL_CROSSING_KEY: ${{ secrets.VISUAL_CROSSING_KEY }}
+          WAQI_TOKEN: ${{ secrets.WAQI_TOKEN }}
+        run: |
+          python pm25_fetcher.py
