@@ -32,6 +32,8 @@ jobs:
           python pm25_fetcher.py
 
       - name: Commit output files
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -41,5 +43,4 @@ jobs:
           mv aqi_forecast_plot.png outputs/aqi_forecast_plot_$timestamp.png || true
           git add outputs/
           git commit -m "Add outputs from run at $timestamp" || echo "No changes to commit"
-          git push
-
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:${{ github.ref }}
