@@ -1,9 +1,16 @@
 name: PM2.5 Data Fetcher
 
+<<<<<<< HEAD
 on:
   schedule:
     - cron: "0 */3 * * *"   # Every 3 hours
   workflow_dispatch:        # Allow manual run
+=======
+# on:
+#   schedule:
+#     - cron: '0 * * * *'  # Runs every hour
+#   workflow_dispatch:      # Manual trigger support
+>>>>>>> 6e283bdffd38dc05fe8ec5bf80dd6432237c08f3
 
 jobs:
   fetch-pm25:

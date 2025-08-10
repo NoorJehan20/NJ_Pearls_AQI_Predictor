@@ -20,9 +20,14 @@ if not WAQI_TOKEN or not VISUAL_CROSSING_KEY:
 # 2. Config
 # ================================
 CITY = "Karachi"
+<<<<<<< HEAD
 TIMEZONE = "Asia/Karachi"
 MODEL_PATH = "best_model_xgboost_new.pkl"
 OUTPUT_CSV = "realtime_aqi_forecast.csv"
+=======
+WAQI_TOKEN = os.environ.get("WAQI_TOKEN")  
+OUTPUT_FILE = "waqi_karachi_pm25_hourly.csv"
+>>>>>>> 6e283bdffd38dc05fe8ec5bf80dd6432237c08f3
 
 # ================================
 # 3. Load trained model
