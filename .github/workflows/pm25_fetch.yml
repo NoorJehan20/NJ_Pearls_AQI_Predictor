@@ -30,3 +30,16 @@ jobs:
           WAQI_TOKEN: ${{ secrets.WAQI_TOKEN }}
         run: |
           python pm25_fetcher.py
+
+      - name: Commit output files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          timestamp=$(date -u +"%Y%m%d_%H%M%S")
+          mkdir -p outputs
+          mv realtime_aqi_forecast.csv outputs/realtime_aqi_forecast_$timestamp.csv
+          mv aqi_forecast_plot.png outputs/aqi_forecast_plot_$timestamp.png || true
+          git add outputs/
+          git commit -m "Add outputs from run at $timestamp" || echo "No changes to commit"
+          git push
+
