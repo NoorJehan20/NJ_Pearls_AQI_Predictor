@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 import numpy as np
-import joblib
+import xgboost as xgb
 import matplotlib.pyplot as plt
 import os
 import pytz
@@ -15,7 +15,7 @@ VISUAL_CROSSING_KEY = os.getenv("VISUAL_CROSSING_KEY")
 if not WAQI_TOKEN or not VISUAL_CROSSING_KEY:
     raise ValueError("Missing API keys from environment variables")
     
-MODEL_PATH = "best_model_xgboost_new.pkl"  
+MODEL_PATH = "best_model_xgboost_new.json"  # Changed extension to .json for native xgboost save_model
 CITY = "Karachi"
 LAT, LON = 24.8607, 67.0011
 FORECAST_DAYS = 3
@@ -42,7 +42,9 @@ def safe_get(d, *keys, default=np.nan):
 
 # =============== LOAD MODEL ===============
 try:
-    model = joblib.load(MODEL_PATH)
+    model = xgb.XGBRegressor()
+    model._Booster = xgb.Booster()
+    model._Booster.load_model(MODEL_PATH)
     print(f"✅ Loaded model from {MODEL_PATH}")
 except Exception as e:
     raise SystemExit(f"❌ Failed to load model at {MODEL_PATH}: {e}")
@@ -191,14 +193,7 @@ save_cols = ["datetime","Predicted_AQI","AQI_Category","Live_AQI_used"] + expect
 df_hours.to_csv(OUT_CSV, index=False, columns=[c for c in save_cols if c in df_hours.columns])
 print(f"💾 Saved forecast & predictions to {OUT_CSV}")
 
-# =============== PLOT AND SAVE ===============
-plt.figure(figsize=(12,6))
-
-plt.plot(df_hours["datetime"], df_hours["Predicted_AQI"], marker="o", label="Predicted AQI", color="royalblue")
-
-if live_aqi is not None:
-    plt.axhline(y=float(live_aqi), color="crimson", linestyle="--", label=f"Live AQI (WAQI={live_aqi})")
-
+# =============== PLOT ===============
 plt.title(f"{CITY} — Predicted AQI (next {len(df_hours)} hrs)")
 plt.xlabel("Local time (PKT)")
 plt.ylabel("AQI")
