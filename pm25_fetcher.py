@@ -32,12 +32,17 @@ def main():
 
         # Fetch live AQI from WAQI
         waqi_url = f"https://api.waqi.info/feed/{CITY}/?token={waqi_key}"
-        waqi_data = requests.get(waqi_url).json()
+        waqi_resp = requests.get(waqi_url)
+        waqi_resp.raise_for_status()  # Raise for HTTP errors
 
-        if waqi_data["status"] != "ok":
-            raise ValueError(f"WAQI API Error: {waqi_data}")
+        waqi_data = waqi_resp.json()
+        if waqi_data.get("status") != "ok":
+            raise ValueError(f"WAQI API returned error status: {waqi_data}")
 
-        live_aqi = waqi_data["data"]["aqi"]
+        live_aqi = waqi_data.get("data", {}).get("aqi")
+        if live_aqi is None:
+            raise ValueError("Live AQI data missing from WAQI response")
+
         local_time = datetime.now(pytz.timezone(TIMEZONE))
         print(f"📌 Live AQI (WAQI): {live_aqi}  Time (local): {local_time}")
 
@@ -46,19 +51,22 @@ def main():
             f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"
             f"{CITY}/today?unitGroup=metric&include=hours&key={vc_key}&contentType=json"
         )
-        vc_data = requests.get(vc_url).json()
+        vc_resp = requests.get(vc_url)
+        vc_resp.raise_for_status()
 
-        hourly_data = vc_data.get("days", [])[0].get("hours", [])
-        current_hour = local_time.hour
-        cross_aqi = None
-
-        for h in hourly_data:
-            if h["datetime"][:2] == str(current_hour).zfill(2):
-                cross_aqi = h.get("pm2p5") or h.get("aqi") or None
-                break
-
-        if cross_aqi is None:
+        vc_data = vc_resp.json()
+        days = vc_data.get("days", [])
+        if not days:
+            print("⚠️ Visual Crossing response missing 'days' data")
             cross_aqi = np.nan
+        else:
+            hourly_data = days[0].get("hours", [])
+            current_hour_str = str(local_time.hour).zfill(2)
+            cross_aqi = np.nan
+            for h in hourly_data:
+                if h.get("datetime", "")[:2] == current_hour_str:
+                    cross_aqi = h.get("pm2p5") or h.get("aqi") or np.nan
+                    break
 
         diff = abs(live_aqi - cross_aqi) if not np.isnan(cross_aqi) else np.nan
         trust_level = "High" if diff <= 10 else "Medium" if diff <= 25 else "Low"
