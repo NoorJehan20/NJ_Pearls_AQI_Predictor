@@ -119,7 +119,7 @@ def main():
         y_true = np.array([float(live_aqi)] * len(df_hours))
         y_pred = df_hours["Predicted_AQI"].values
         mae = mean_absolute_error(y_true, y_pred)
-        rmse = mean_squared_error(y_true, y_pred, squared=False)
+        rmse = mean_squared_error([live_aqi], [pred_aqi]) ** 0.5
         mape = np.mean(np.abs((y_pred - y_true) / (y_true + 1e-9))) * 100
 
         print(f"📊 Accuracy vs current live AQI={live_aqi} (coarse): MAE={mae:.2f}, RMSE={rmse:.2f}, MAPE={mape:.2f}%")
