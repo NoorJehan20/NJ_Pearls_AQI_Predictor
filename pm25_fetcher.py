@@ -10,10 +10,10 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 # ================================
 # 1. Load environment variables
 # ================================
-WAQI_TOKEN = os.getenv("WAQI_TOKEN")
-VISUAL_CROSSING_KEY = os.getenv("VISUAL_CROSSING_KEY")
+waqi_key = os.getenv("WAQI_TOKEN")
+vc_key = os.getenv("VISUAL_CROSSING_KEY")
 
-if not WAQI_TOKEN or not VISUAL_CROSSING_KEY:
+if not waqi_key or not vc_key:
     raise ValueError("Missing WAQI_TOKEN or VISUAL_CROSSING_KEY. Check GitHub Secrets.")
 
 # ================================
@@ -34,7 +34,7 @@ print(f"✅ Loaded model from {MODEL_PATH}")
 # ================================
 # 4. Fetch live AQI from WAQI
 # ================================
-waqi_url = f"https://api.waqi.info/feed/{CITY}/?token={WAQI_TOKEN}"
+waqi_url = f"https://api.waqi.info/feed/{CITY}/?token={waqi_key}"
 waqi_data = requests.get(waqi_url).json()
 
 if waqi_data["status"] != "ok":
@@ -49,7 +49,7 @@ print(f"📌 Live AQI (WAQI): {live_aqi}  Time (local): {local_time}")
 # ================================
 vc_url = (
     f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"
-    f"{CITY}/today?unitGroup=metric&include=hours&key={VISUAL_CROSSING_KEY}&contentType=json"
+    f"{CITY}/today?unitGroup=metric&include=hours&key={vc_key}&contentType=json"
 )
 vc_data = requests.get(vc_url).json()
 
