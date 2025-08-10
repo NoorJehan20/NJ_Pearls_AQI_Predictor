@@ -10,10 +10,11 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 # ================================
 # 1. Load environment variables
 # ================================
-WAQI_TOKEN = os.getenv("WAQI_TOKEN")
-VISUAL_CROSSING_KEY = os.getenv("VISUAL_CROSSING_KEY")
 
-if not WAQI_TOKEN or not VISUAL_CROSSING_KEY:
+print("DEBUG: WAQI_TOKEN =", os.getenv("WAQI_TOKEN"))
+print("DEBUG: VISUAL_CROSSING_KEY =", os.getenv("VISUAL_CROSSING_KEY"))
+
+if not os.getenv("WAQI_TOKEN") or not os.getenv("VISUAL_CROSSING_KEY"):
     raise ValueError("Missing WAQI_TOKEN or VISUAL_CROSSING_KEY. Check GitHub Secrets.")
 
 # ================================
