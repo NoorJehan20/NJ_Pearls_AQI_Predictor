@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          persist-credentials: false  # Disable default token to use custom one later
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -33,7 +33,7 @@ jobs:
         run: |
           python pm25_fetcher.py
 
-      - name: Merge hourly files into daily
+      - name: Merge hourly CSVs into daily file
         run: |
           python merge_hourly_to_daily.py
 
@@ -41,11 +41,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          timestamp=$(date -u +"%Y%m%d")
-          mkdir -p outputs
-          mv daily_aqi_${timestamp}.csv outputs/daily_aqi_${timestamp}.csv
+          timestamp=$(date -u +"%Y%m%d_%H%M%S")
           git add outputs/
-          git commit -m "Add daily AQI file for $timestamp" || echo "No changes to commit"
+          git commit -m "Add outputs from run at $timestamp" || echo "No changes to commit"
 
       - name: Push changes
         env:
