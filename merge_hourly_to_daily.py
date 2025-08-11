@@ -26,10 +26,16 @@ for file in hourly_files:
 
 daily_df = pd.concat(df_list, ignore_index=True)
 
-# Save daily CSV
-daily_file = os.path.join(OUTPUT_DIR, f"daily_aqi_{today_str}.csv")
-daily_df.to_csv(daily_file, index=False)
-print(f"Daily file saved: {daily_file}")
+# Save daily CSV with date in name
+dated_daily_file = os.path.join(OUTPUT_DIR, f"daily_aqi_{today_str}.csv")
+daily_df.to_csv(dated_daily_file, index=False)
+
+# Also save/overwrite a stable file for UI usage
+stable_daily_file = os.path.join(OUTPUT_DIR, "daily_aqi.csv")
+daily_df.to_csv(stable_daily_file, index=False)
+
+print(f"Daily file saved: {dated_daily_file}")
+print(f"Stable file updated: {stable_daily_file}")
 
 # Optional: remove hourly files after merging
 for file in hourly_files:
