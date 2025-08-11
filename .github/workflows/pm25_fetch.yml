@@ -42,23 +42,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           timestamp=$(date -u +"%Y%m%d_%H%M%S")
-          mkdir -p outputs
-
-          # Save timestamped versions
-          cp realtime_aqi_forecast.csv outputs/realtime_aqi_forecast_$timestamp.csv
-          cp daily_aqi.csv outputs/daily_aqi_$timestamp.csv
-
-          # Save 'latest' versions (overwrite each run)
-          cp realtime_aqi_forecast.csv outputs/realtime_aqi_forecast_latest.csv
-          cp daily_aqi.csv outputs/daily_aqi_latest.csv
-
-          # Optional: plots
-          if [ -f aqi_forecast_plot.png ]; then
-            cp aqi_forecast_plot.png outputs/aqi_forecast_plot_$timestamp.png
-            cp aqi_forecast_plot.png outputs/aqi_forecast_plot_latest.png
-          fi
-
-          git add outputs/
+          # Add all daily CSV files (date-based)
+          git add outputs/daily_aqi_*.csv
+          git add outputs/realtime_aqi_forecast_*.csv || true
+          git add outputs/aqi_forecast_plot_*.png || true
           git commit -m "Add outputs from run at $timestamp" || echo "No changes to commit"
 
       - name: Push changes
