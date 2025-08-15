@@ -33,9 +33,10 @@ jobs:
         run: |
           python pm25_fetcher.py
 
-      - name: Merge hourly CSVs into daily file (safe append)
+      - name: Merge hourly CSVs into daily file 
         run: |
-          python merge_hourly_to_daily_safe.py  # this will be the updated safe merge script
+         python merge_hourly_to_daily_safe.py
+
 
       - name: Commit output files
         run: |
