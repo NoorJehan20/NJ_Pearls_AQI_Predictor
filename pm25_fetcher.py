@@ -8,21 +8,6 @@ import pytz
 from datetime import datetime
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-<<<<<<< HEAD
-# ================================
-# 1. Load environment variables
-# ================================
-
-print("DEBUG: WAQI_TOKEN =", os.getenv("WAQI_TOKEN"))
-print("DEBUG: VISUAL_CROSSING_KEY =", os.getenv("VISUAL_CROSSING_KEY"))
-
-if not os.getenv("WAQI_TOKEN") or not os.getenv("VISUAL_CROSSING_KEY"):
-    raise ValueError("Missing WAQI_TOKEN or VISUAL_CROSSING_KEY. Check GitHub Secrets.")
-
-# ================================
-# 2. Config
-# ================================
-=======
 # =============== CONFIG ===============
 WAQI_TOKEN = os.getenv("WAQI_TOKEN")
 VISUAL_CROSSING_KEY = os.getenv("VISUAL_CROSSING_KEY")
@@ -31,7 +16,6 @@ if not WAQI_TOKEN or not VISUAL_CROSSING_KEY:
     raise ValueError("Missing API keys from environment variables")
     
 MODEL_PATH = "best_model_xgboost_new.pkl"  
->>>>>>> 61a8269caf0980bd80fdcfcabd7b91ca527e9f39
 CITY = "Karachi"
 LAT, LON = 24.8607, 67.0011
 FORECAST_DAYS = 3
