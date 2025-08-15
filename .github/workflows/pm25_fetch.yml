@@ -1,7 +1,9 @@
 name: PM2.5 Fetcher
 
 on:
-  workflow_dispatch:  # allows manual trigger
+  schedule:
+    - cron: '0 * * * *'  # runs every hour
+  workflow_dispatch:    # manual trigger option
 
 jobs:
   run-fetcher:
@@ -10,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -20,6 +24,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
+          pip install --upgrade scikit-learn xgboost pandas
 
       - name: Run PM2.5 fetcher
         env:
@@ -27,3 +32,25 @@ jobs:
           WAQI_TOKEN: ${{ secrets.WAQI_TOKEN }}
         run: |
           python pm25_fetcher.py
+
+      - name: Merge hourly CSVs into daily file
+        run: |
+          python merge_hourly_to_daily.py
+
+      - name: Commit output files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          timestamp=$(date -u +"%Y%m%d_%H%M%S")
+          # Add all daily CSV files (date-based)
+          git add outputs/daily_aqi_*.csv
+          git add outputs/realtime_aqi_forecast_*.csv || true
+          git add outputs/aqi_forecast_plot_*.png || true
+          git commit -m "Add outputs from run at $timestamp" || echo "No changes to commit"
+
+      - name: Push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+          git push origin HEAD:${{ github.ref }}
