@@ -35,7 +35,7 @@ jobs:
 
       - name: Merge hourly CSVs into daily file 
         run: |
-         python merge_hourly_to_daily_safe.py
+         python merge_hourly_to_daily.py
 
 
       - name: Commit output files
