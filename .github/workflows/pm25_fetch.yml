@@ -33,16 +33,16 @@ jobs:
         run: |
           python pm25_fetcher.py
 
-      - name: Merge hourly CSVs into daily file
+      - name: Merge hourly CSVs into daily file 
         run: |
-          python merge_hourly_to_daily.py
+         python merge_hourly_to_daily.py
+
 
       - name: Commit output files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           timestamp=$(date -u +"%Y%m%d_%H%M%S")
-          # Add all daily CSV files (date-based)
           git add outputs/daily_aqi_*.csv
           git add outputs/realtime_aqi_forecast_*.csv || true
           git add outputs/aqi_forecast_plot_*.png || true

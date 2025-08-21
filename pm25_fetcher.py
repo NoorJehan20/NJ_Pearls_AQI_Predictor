@@ -186,14 +186,27 @@ else:
     mae = rmse = mape = None
     print("⚠️ Skipped accuracy metrics due to missing live AQI")
 
-# =============== SAVE CSV ===============
+# =============== SAVE HOURLY CSV SAFELY ===============
+os.makedirs("outputs/hourly", exist_ok=True)
+os.makedirs("outputs", exist_ok=True)
+
+timestamp = datetime.now(pytz.timezone(TIMEZONE)).strftime("%Y-%m-%d_%H")
+
+hourly_file = f"outputs/hourly/aqi_forecast_{timestamp}.csv"
+daily_realtime_file = "realtime_aqi_forecast.csv"
+
 save_cols = ["datetime","Predicted_AQI","AQI_Category","Live_AQI_used"] + expected_features
-df_hours.to_csv(OUT_CSV, index=False, columns=[c for c in save_cols if c in df_hours.columns])
-print(f"💾 Saved forecast & predictions to {OUT_CSV}")
+
+# Save timestamped hourly file (for merging later)
+df_hours.to_csv(hourly_file, index=False, columns=[c for c in save_cols if c in df_hours.columns])
+print(f"💾 Saved hourly forecast to {hourly_file}")
+
+# Also save/update a "latest realtime" CSV (like before, so you can always see most recent data)
+df_hours.to_csv(daily_realtime_file, index=False, columns=[c for c in save_cols if c in df_hours.columns])
+print(f"💾 Saved latest realtime forecast to {daily_realtime_file}")
 
 # =============== PLOT AND SAVE ===============
 plt.figure(figsize=(12,6))
-
 plt.plot(df_hours["datetime"], df_hours["Predicted_AQI"], marker="o", label="Predicted AQI", color="royalblue")
 
 if live_aqi is not None:
@@ -206,6 +219,11 @@ plt.xticks(rotation=30)
 plt.grid(alpha=0.3)
 plt.legend()
 plt.tight_layout()
-plt.savefig("aqi_forecast_plot.png")
+
+plot_file = f"outputs/aqi_forecast_plot_{timestamp}.png"
+plt.savefig(plot_file)
+plt.close()
+print(f"💾 Saved AQI forecast plot as {plot_file}")
+
 plt.close()
 print("💾 Saved AQI forecast plot as aqi_forecast_plot.png")
