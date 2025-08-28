@@ -1,4 +1,4 @@
-# AQIPM AQI Predictor
+# AQI Predictor
 
 [![Python](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.30-orange?logo=streamlit&logoColor=white)](https://streamlit.io/)
@@ -10,7 +10,7 @@
 
 ## Overview
 
-**AQIPM (Air Quality Index Prediction Model)** is an interactive dashboard and machine learning project that predicts the Air Quality Index (AQI) based on PM2.5 and other pollutant data. It allows users to monitor air quality in Karachi with real-time predictions and trend visualizations.
+**AQI Predictor (Air Quality Index Prediction Model)** is an interactive dashboard and machine learning project that predicts the Air Quality Index (AQI) based on PM2.5 and other pollutant data. It allows users to monitor air quality in Karachi with real-time predictions and trend visualizations.
 
 ---
 
@@ -27,8 +27,9 @@
 
 ## Demo
 
-![AQIPM Dashboard](screenshots/dashboard.png)  
-*Screenshot of AQIPM dashboard showing predicted AQI and pollutant trends.*
+![AQI Dashboard](screenshots/dashboard.png)  
+![AQI Dashboard Visuals](screenshots/plots.png)  
+*Screenshot of AQI dashboard showing predicted AQI and pollutant trends.*
 
 **Live Demo (if hosted)**: [Try AQIPM Predictor](https://your-app-link)  
 
