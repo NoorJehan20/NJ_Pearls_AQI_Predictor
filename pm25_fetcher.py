@@ -8,7 +8,7 @@ import pytz
 from datetime import datetime
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-# =============== CONFIG ===============
+# CONFIG 
 WAQI_TOKEN = os.getenv("WAQI_TOKEN")
 VISUAL_CROSSING_KEY = os.getenv("VISUAL_CROSSING_KEY")
 
@@ -22,7 +22,7 @@ FORECAST_DAYS = 3
 TIMEZONE = "Asia/Karachi"
 OUT_CSV = "realtime_aqi_forecast.csv"
 
-# =============== HELPERS ===============
+# HELPERS 
 def categorize_aqi(aqi):
     aqi = float(aqi)
     if aqi <= 50: return "Good 😀"
@@ -40,14 +40,14 @@ def safe_get(d, *keys, default=np.nan):
     except Exception:
         return default
 
-# =============== LOAD MODEL ===============
+# LOAD MODEL
 try:
     model = joblib.load(MODEL_PATH)
-    print(f"✅ Loaded model from {MODEL_PATH}")
+    print(f"Loaded model from {MODEL_PATH}")
 except Exception as e:
-    raise SystemExit(f"❌ Failed to load model at {MODEL_PATH}: {e}")
+    raise SystemExit(f"Failed to load model at {MODEL_PATH}: {e}")
 
-# =============== FETCH LIVE AQI ===============
+# FETCH LIVE AQI 
 def fetch_waqi(lat, lon, token):
     try:
         url = f"https://api.waqi.info/feed/geo:{lat};{lon}/?token={token}"
@@ -55,7 +55,7 @@ def fetch_waqi(lat, lon, token):
         r.raise_for_status()
         data = r.json()
         if data.get("status") != "ok":
-            print("⚠️ WAQI returned non-ok status:", data.get("data"))
+            print("WAQI returned non-ok status:", data.get("data"))
             return None, None
         aqi = safe_get(data, "data", "aqi", default=None)
         time_iso = safe_get(data, "data", "time", "iso", default=None)
@@ -70,12 +70,12 @@ def fetch_waqi(lat, lon, token):
                     ts = None
         return aqi, ts
     except Exception as e:
-        print("❌ Error fetching WAQI:", e)
+        print("Error fetching WAQI:", e)
         return None, None
 
 live_aqi, live_ts = fetch_waqi(LAT, LON, WAQI_TOKEN)
 if live_aqi is None:
-    print("⚠️ WAQI failed — predictions will use fallback/NaN lag values")
+    print("WAQI failed — predictions will use fallback/NaN lag values")
 if live_ts is not None:
     if live_ts.tzinfo is None:
         live_ts = live_ts.replace(tzinfo=pytz.UTC)
@@ -83,9 +83,9 @@ if live_ts is not None:
 else:
     live_ts_local = None
 
-print(f"📌 Live AQI (WAQI): {live_aqi}  Time (local): {live_ts_local}")
+print(f"Live AQI (WAQI): {live_aqi}  Time (local): {live_ts_local}")
 
-# =============== FETCH VISUAL CROSSING HOURLY FORECAST ===============
+# FETCH VISUAL CROSSING HOURLY FORECAST
 def fetch_visualcrossing(city, key, days=3):
     try:
         url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city}/next{days}days?unitGroup=metric&include=hours&key={key}&contentType=json"
@@ -93,7 +93,7 @@ def fetch_visualcrossing(city, key, days=3):
         r.raise_for_status()
         return r.json()
     except Exception as e:
-        raise SystemExit(f"❌ VisualCrossing fetch failed: {e}")
+        raise SystemExit(f"VisualCrossing fetch failed: {e}")
 
 vc_json = fetch_visualcrossing(CITY, VISUAL_CROSSING_KEY, FORECAST_DAYS)
 
@@ -124,9 +124,9 @@ df_hours["datetime"] = pd.to_datetime(df_hours["datetimeEpoch"], unit="s", utc=T
 
 now_local = datetime.now(pytz.timezone(TIMEZONE))
 df_hours = df_hours[df_hours["datetime"] >= now_local].reset_index(drop=True)
-df_hours = df_hours.head(72).copy()  # limit to next 72 hours
+df_hours = df_hours.head(72).copy()  
 
-# =============== FEATURE ENGINEERING ===============
+# FEATURE ENGINEERING
 df_hours["hour"] = df_hours["datetime"].dt.hour
 df_hours["day_of_week"] = df_hours["datetime"].dt.dayofweek
 df_hours["is_weekend"] = df_hours["day_of_week"].isin([5,6]).astype(int)
@@ -138,15 +138,15 @@ for pollutant in ["so2", "no2", "o3", "co"]:
     if pollutant not in df_hours.columns:
         df_hours[pollutant] = np.nan
 
-# =============== LAG FEATURE PREP ===============
+# LAG FEATURE PREP 
 if live_aqi is None:
-    print("⚠️ live_aqi missing; filling lag features with NaN")
+    print("live_aqi missing; filling lag features with NaN")
     df_hours["aqi_lag1"] = np.nan
 else:
     df_hours["aqi_lag1"] = np.nan
     df_hours.loc[0, "aqi_lag1"] = float(live_aqi)
 
-# =============== PREDICTION LOOP ===============
+# PREDICTION LOOP 
 feature_cols = ['temp','dew','humidity','precip','windspeed','winddir','visibility',
                 'so2','no2','o3','co','hour','day_of_week','is_weekend','dow_sin','dow_cos','aqi_lag1']
 
@@ -156,7 +156,7 @@ expected_features = list(model.feature_names_in_) if hasattr(model, "feature_nam
 for col in expected_features:
     if col not in df_hours.columns:
         df_hours[col] = np.nan
-        print(f"⚠️ Missing feature '{col}' added with NaN")
+        print(f"Missing feature '{col}' added with NaN")
 
 predictions = []
 for i in range(len(df_hours)):
@@ -174,19 +174,19 @@ df_hours["Predicted_AQI"] = predictions
 df_hours["AQI_Category"] = df_hours["Predicted_AQI"].apply(categorize_aqi)
 df_hours["Live_AQI_used"] = float(live_aqi) if live_aqi is not None else np.nan
 
-# =============== ACCURACY METRICS ===============
+# ACCURACY METRICS 
 if live_aqi is not None:
     y_true = np.array([float(live_aqi)] * len(df_hours))
     y_pred = df_hours["Predicted_AQI"].values
     mae = mean_absolute_error(y_true, y_pred)
     rmse = mean_squared_error(y_true, y_pred) ** 0.5
     mape = np.mean(np.abs((y_pred - y_true) / (y_true + 1e-9))) * 100
-    print(f"\n📊 Accuracy vs live AQI={live_aqi} (coarse): MAE={mae:.2f}, RMSE={rmse:.2f}, MAPE={mape:.2f}%")
+    print(f"\nAccuracy vs live AQI={live_aqi} (coarse): MAE={mae:.2f}, RMSE={rmse:.2f}, MAPE={mape:.2f}%")
 else:
     mae = rmse = mape = None
-    print("⚠️ Skipped accuracy metrics due to missing live AQI")
+    print("Skipped accuracy metrics due to missing live AQI")
 
-# =============== SAVE HOURLY CSV SAFELY ===============
+# SAVE HOURLY CSV SAFELY 
 os.makedirs("outputs/hourly", exist_ok=True)
 os.makedirs("outputs", exist_ok=True)
 
@@ -205,7 +205,7 @@ print(f"💾 Saved hourly forecast to {hourly_file}")
 df_hours.to_csv(daily_realtime_file, index=False, columns=[c for c in save_cols if c in df_hours.columns])
 print(f"💾 Saved latest realtime forecast to {daily_realtime_file}")
 
-# =============== PLOT AND SAVE ===============
+# PLOT AND SAVE 
 plt.figure(figsize=(12,6))
 plt.plot(df_hours["datetime"], df_hours["Predicted_AQI"], marker="o", label="Predicted AQI", color="royalblue")
 
