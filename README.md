@@ -31,8 +31,6 @@
 ![AQI Dashboard Visuals](screenshots/plots.png)  
 *Screenshot of AQI dashboard showing predicted AQI and pollutant trends.*
 
-**Live Demo (if hosted)**: [Try AQIPM Predictor](https://your-app-link)  
-
 ---
 
 ## Installation
@@ -88,6 +86,7 @@ aqi-pm25-collector/
 ├── requirements.txt       # Python dependencies
 ├── .github/workflows/     # GitHub Actions workflows
 ├── outputs/               # Outputs from latest runs
+├── screenshots/           #Screenshots from streamlit dashboard
 └── README.md              # Project documentation
 ```
 
@@ -119,11 +118,3 @@ Contributions are welcome!
 * Extend forecasts to 7+ days
 * Mobile-friendly dashboard version
 * Incorporation of weather features for improved accuracy
-
----
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-```
