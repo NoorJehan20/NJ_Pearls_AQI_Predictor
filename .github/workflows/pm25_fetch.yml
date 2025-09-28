@@ -2,7 +2,7 @@ name: PM2.5 Fetcher
 
 on:
   schedule:
-    - cron: '0 * * * *'  # runs every hour
+    # - cron: '0 * * * *'  # runs every hour
   workflow_dispatch:    # manual trigger option
 
 jobs:
